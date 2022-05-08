@@ -1,3 +1,4 @@
+from re import A
 from selenium import webdriver
 from threading import Thread
 from random import randint
@@ -5,7 +6,7 @@ import os
 import time
 
 
-def Bot():
+def Bot(filter, headless):
     site = "https://pictureswap.co/"
 
     op = webdriver.ChromeOptions()
@@ -19,15 +20,25 @@ def Bot():
     upload_button_xpath = '//*[@id="file"]'
     swap_button_xpath = '//*[@id="form"]/div[1]/div/button'
     nsfw_button_xpath = '//*[@id="form"]/div[2]/label[3]'
+    sfw_button_xpath = '//*[@id="form"]/div[2]/label[2]'
+    random_button_xpath = '//*[@id="form"]/div[2]/label[1]'
     upload_new_button_xpath = '//*[@id="message"]/button'
     image_xpath = '//*[@id="preview"]'
     
     upload_button = driver.find_element("xpath", upload_button_xpath)
     swap_button = driver.find_element("xpath", swap_button_xpath)
     nsfw_button = driver.find_element("xpath", nsfw_button_xpath)
+    sfw_button = driver.find_element("xpath", sfw_button_xpath)
+    random_button = driver.find_element("xpath", random_button_xpath)
 
-    nsfw_button.click()
+    if filter == "nsfw":
+        nsfw_button.click()
+
+    if filter == "sfw":
+        sfw_button.click()
+
     upload_button.send_keys(file)
+    print("Started a new ", filter, " thread")
 
     while True:
         time.sleep(randint(3, 10))
@@ -40,8 +51,14 @@ def Bot():
         else:
             print("Success! ", driver.find_element("xpath", image_xpath).get_property("naturalHeight"), "x", driver.find_element("xpath", image_xpath).get_property("naturalWidth"), sep="")
 
+threads_per_filter = 20
+for _ in range(threads_per_filter):
+    a = Thread(target=Bot, args=["nsfw", False])
+    a.start()
 
-for _ in range(5):
-    t = Thread(target=Bot)
-    t.start()
+    b = Thread(target=Bot, args=["sfw", False])
+    b.start()
+
+    c = Thread(target=Bot, args=["random", False])
+    c.start()
     time.sleep(2)
