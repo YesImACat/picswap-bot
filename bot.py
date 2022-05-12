@@ -10,7 +10,9 @@ def Bot(filter, headless):
     site = "https://pictureswap.co/"
 
     op = webdriver.ChromeOptions()
-    op.add_argument('--headless')
+    
+    if headless:
+        op.add_argument('--headless')
 
     driver = webdriver.Chrome(options=op)
 
@@ -49,16 +51,17 @@ def Bot(filter, headless):
             driver.find_element("xpath", upload_new_button_xpath).click()
 
         else:
-            print("Success! ", driver.find_element("xpath", image_xpath).get_property("naturalHeight"), "x", driver.find_element("xpath", image_xpath).get_property("naturalWidth"), sep="")
+            print("Success! ", driver.find_element("xpath", image_xpath).get_property("naturalHeight"), "x", driver.find_element("xpath", image_xpath).get_property("naturalWidth"), " image returned", sep="")
 
+# Multi-threading must be headless
 threads_per_filter = 20
 for _ in range(threads_per_filter):
-    a = Thread(target=Bot, args=["nsfw", False])
+    a = Thread(target=Bot, args=["nsfw", True])
     a.start()
 
-    b = Thread(target=Bot, args=["sfw", False])
+    b = Thread(target=Bot, args=["sfw", True])
     b.start()
 
-    c = Thread(target=Bot, args=["random", False])
+    c = Thread(target=Bot, args=["random", True])
     c.start()
     time.sleep(2)
